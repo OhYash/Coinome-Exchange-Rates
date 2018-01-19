@@ -1,7 +1,8 @@
 import urllib.request
 from bs4 import BeautifulSoup
 from datetime import datetime
-import pandas as pd
+import time
+import sqlite3
 
 def fetchDataOnce() :
     # Fetches data once.
@@ -22,15 +23,14 @@ def fetchDataOnce() :
     for item in therow :
         item1 = item.a.find("span", {"class" : "last-market-rate-b"})
         datablock.append(item1.span.string)
-    #dataframe = pd.DataFrame(data = [datablock], columns=['Date', 'Time', 'BTC/INR', 'BCH/INR', 'LTC/INR'])
-    #return dataframe
     return datablock
 
 def printData() :
-    db = fetchDataOnce()
-    df = pd.DataFrame(data = [db], columns=['Date-Time', 'BTC/INR', 'BCH/INR', 'LTC/INR', 'DASH/INR'])
-    df.set_index(['Date-Time'], inplace=True)
-    print(df)
+    print("Date/Time\tBTC/INR\tBCH/INR\tLTC/INR")
+    while(True) :
+        db = fetchDataOnce()
+        print("%d\t%d\t%d\t%d" % {db[0], db[1], db[2], db[3]})
+        time.sleep(30)
 
 # ::: MAIN from here :::
 
