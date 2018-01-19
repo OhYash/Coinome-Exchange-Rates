@@ -26,10 +26,11 @@ def fetchDataOnce() :
     return datablock
 
 def printData() :
-    print("Date/Time\tBTC/INR\tBCH/INR\tLTC/INR")
+    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH\INR", sep=" \t ")
     while(True) :
         db = fetchDataOnce()
-        print("%d\t%d\t%d\t%d" % {db[0], db[1], db[2], db[3]})
+        #print("%s\t%s\t%s\t%s" % {db[1], db[2], db[3], db[4]})
+        print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], sep=" \t ")
         time.sleep(30)
 
 # ::: MAIN from here :::
