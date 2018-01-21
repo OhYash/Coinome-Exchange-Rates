@@ -4,10 +4,14 @@ from datetime import datetime
 import time
 import sqlite3
 
+global db
+global _printData
+global _storeData
+
 def fetchDataOnce() :
     # Fetches data once.
     # Return the datablock as a list.
-    # List Structure : DateTime, BTC/INR, BCH/INR, LTC/INR
+    # List Structure : DateTime, BTC/INR, BCH/INR, LTC/INR, DASH/INR
     weblink = "https://www.coinome.com/exchange"
     webpage = urllib.request.urlopen(weblink)
     datetimenow = datetime.now()
@@ -26,13 +30,22 @@ def fetchDataOnce() :
     return datablock
 
 def printData() :
-    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH\INR", sep=" \t ")
-    while(True) :
-        db = fetchDataOnce()
-        #print("%s\t%s\t%s\t%s" % {db[1], db[2], db[3], db[4]})
-        print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], sep=" \t ")
-        time.sleep(30)
+    print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], sep=" \t ")
 
 # ::: MAIN from here :::
 
-printData()
+
+#    temporary
+_printData = 1
+_storeData = 0
+if(_printData == 1) :
+    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH\INR", sep=" \t ")
+
+while(True) :
+    db = fetchDataOnce()
+    if(_printData == 1) :
+        printData()
+    if(_storeData == 1) :
+        checkAndCreateDatabase()
+        storeData()
+    time.sleep(30)
