@@ -34,17 +34,13 @@ def printData() :
     print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], sep=" \t ")
 
 def openDatabase() :
-    _filename = ("data/db_%s.db" % db[0].date())
-    # Check if database of the day exists
-    if(os.path.exists(_fileName)) : 
-        _createdb = 1
+    _fileName = ("data/db_%s.db" % db[0].date())
+    # Connect to the database
     conn = sqlite3.connect(_fileName)
     curr = conn.cursor()
-    # Create table in this fresh database
-    if(_createdb == 1) :    
-        curr.execute('''CREATE TABLE RATES
+    # Create table
+    curr.execute('''CREATE TABLE IF NOT EXISTS RATES
         (time text, BTCINR real, BCHINR real, LTCINR real, DASHINR real)''')
-        curr.commit()
     # Return cursor
     return curr
 
