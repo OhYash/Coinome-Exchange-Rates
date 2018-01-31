@@ -21,7 +21,7 @@ via apt-get in Ubuntu :
 
 ## Usage
 
-This Basic branch is enough to get the data fetched from the servers and to be used for personal purposes.  
+This minimal branch is enough to get the data fetched from the servers.   
 
 Clone this repository and run 'fetch_data.py'   
 `
