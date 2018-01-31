@@ -3,11 +3,13 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import time
 import sqlite3
+import sys
 import os
 
-global db
-global _printData
-global _storeData
+_printData = True
+_storeData = False
+_printOnce = False
+_sec = 30
 
 def fetchDataOnce() :
     # Fetches data once.
@@ -33,6 +35,35 @@ def fetchDataOnce() :
 def printData() :
     print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], sep=" \t ")
 
+def parseArguments(args) :
+    global _printData
+    global _storeData
+    global _printOnce
+    global _sec
+    for arg in args :
+        if arg in ("-n", "--noprint") :
+            _storeData = True
+            _printData = False
+        elif arg in ("-o", '--once') :
+            _printOnce = True
+        elif arg in ("-s", "--store") :
+            _storeData = True
+        elif arg in ("-t", "--time") :
+            _sec = int(args[args.index(arg)+1])
+        elif arg in ("-h", "--help") :
+            usage()
+            sys.exit(0)
+     
+def usage() :
+    print("Coinome Price fetcher by Yash Yadav (yashdimpu@gmail.com)\n")
+    print("Usage : python monitor_coinome.py [options]")
+    print("\nOptions :")
+    print("-n, --noprint \t\t Only store data, dont print")
+    print("-o, --once \t\t Print data once and exit")
+    print("-s, --store \t\t Store the data in database")
+    print("-t, --time NUM \t\t Set NUM seconds delay between each time data is fetched(Default is 30)")
+    print("-h, --help \t\t Display this help and exit")
+
 def openDatabase() :
     _fileName = ("data/db_%s.db" % db[0].date())
     # Connect to the database
@@ -52,28 +83,29 @@ def storeData(curr) :
            float(db[4].replace(',','')))
     curr.execute("INSERT INTO RATES VALUES(?, ?, ?, ?, ?)", data)
 
-#   Temporary
-_printData = 1
-_storeData = 1
-#   End of temporary
-
 
 # ::: MAIN from here :::
 
-if(_printData == 1) :
+#Parse Commandline Arguments
+parseArguments(sys.argv[1:])
+
+if(_printData) :
     print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH\INR", sep=" \t ")
+#Creates database folder in the first run
 if not os.path.exists("data") :
     os.makedirs("data")
 try :
     while(True) :
         db = fetchDataOnce()
-        if(_printData == 1) :
+        if(_printData) :
             printData()
-        if(_storeData == 1) :
+        if(_storeData) :
             curr = openDatabase()
             storeData(curr)
-        time.sleep(30)
+        if(_printOnce) :
+            sys.exit(0)
+        time.sleep(_sec)
 except KeyboardInterrupt : 
     print("\nQuitting")
-    if(_storeData == 1) :
+    if(_storeData) :
         curr.close()
