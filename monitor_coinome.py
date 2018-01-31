@@ -52,6 +52,8 @@ def storeData(curr) :
            float(db[4].replace(',','')))
     curr.execute("INSERT INTO RATES VALUES(?, ?, ?, ?, ?)", data)
 
+def closeDataBase(curr) :
+    curr.close()
 
 #   Temporary
 _printData = 1
@@ -65,12 +67,15 @@ if(_printData == 1) :
     print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH\INR", sep=" \t ")
 if not os.path.exists("data") :
     os.makedirs("data")
-
-while(True) :
-    db = fetchDataOnce()
-    if(_printData == 1) :
-        printData()
-    if(_storeData == 1) :
-        curr = openDatabase()
-        storeData(curr)
-    time.sleep(30)
+try :
+    while(True) :
+        db = fetchDataOnce()
+        if(_printData == 1) :
+            printData()
+        if(_storeData == 1) :
+            curr = openDatabase()
+            storeData(curr)
+        time.sleep(30)
+except KeyboardInterrupt : 
+    print("\nQuitting")
+    closeDataBase(curr)
