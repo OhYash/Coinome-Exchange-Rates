@@ -52,9 +52,6 @@ def storeData(curr) :
            float(db[4].replace(',','')))
     curr.execute("INSERT INTO RATES VALUES(?, ?, ?, ?, ?)", data)
 
-def closeDataBase(curr) :
-    curr.close()
-
 #   Temporary
 _printData = 1
 _storeData = 1
@@ -78,4 +75,5 @@ try :
         time.sleep(30)
 except KeyboardInterrupt : 
     print("\nQuitting")
-    closeDataBase(curr)
+    if(_storeData == 1) :
+        curr.close()
