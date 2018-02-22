@@ -14,7 +14,7 @@ _sec = 30
 def fetchDataOnce() :
     # Fetches data once.
     # Return the datablock as a list.
-    # List Structure : DateTime, BTC/INR, BCH/INR, LTC/INR, DASH/INR, DGB/INR
+    # List Structure : DateTime, BTC/INR, BCH/INR, LTC/INR, DASH/INR, DGB/INR, ZEC/INR
     weblink = "https://www.coinome.com/exchange"
     webpage = urllib.request.urlopen(weblink)
     datetimenow = datetime.now()
@@ -33,7 +33,7 @@ def fetchDataOnce() :
     return datablock
 
 def printData() :
-    print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], db[5], sep=" \t ")
+    print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], db[5], " ", db[6], sep=" \t ")
 
 def parseArguments(args) :
     global _printData
@@ -79,15 +79,16 @@ def openDatabase() :
 def storeData(curr) :
     # Create table
     curr.execute('''CREATE TABLE IF NOT EXISTS RATES_%d
-        (time text, BTCINR real, BCHINR real, LTCINR real, DASHINR real, DGBINR real)''' % datetime.now().day)
+        (time text, BTCINR real, BCHINR real, LTCINR real, DASHINR real, DGBINR real, ZECINR real)''' % datetime.now().day)
     #Store data
     data = (db[0].strftime("%H:%M:%S"),
            float(db[1].replace(',','')),
            float(db[2].replace(',','')),
            float(db[3].replace(',','')),
            float(db[4].replace(',','')),
-           float(db[5].replace(',','')))
-    curr.execute("INSERT INTO RATES_%d VALUES(?, ?, ?, ?, ?, ?)" % db[0].day, data)
+           float(db[5].replace(',','')),
+           float(db[6].replace(',','')))
+    curr.execute("INSERT INTO RATES_%d VALUES(?, ?, ?, ?, ?, ?, ?)" % db[0].day, data)
 
 
 # ::: MAIN from here :::
@@ -104,7 +105,7 @@ printInfo()
 
 #Print table headers
 if(_printData) :
-    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH/INR", "DGB/INR", sep=" \t ")
+    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH/INR", "DGB/INR", "ZEC/INR", sep=" \t ")
 #Open Database
 if(_storeData) :
     curr = openDatabase()
