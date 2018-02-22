@@ -14,7 +14,7 @@ _sec = 30
 def fetchDataOnce() :
     # Fetches data once.
     # Return the datablock as a list.
-    # List Structure : DateTime, BTC/INR, BCH/INR, LTC/INR, DASH/INR
+    # List Structure : DateTime, BTC/INR, BCH/INR, LTC/INR, DASH/INR, DGB/INR
     weblink = "https://www.coinome.com/exchange"
     webpage = urllib.request.urlopen(weblink)
     datetimenow = datetime.now()
@@ -33,7 +33,7 @@ def fetchDataOnce() :
     return datablock
 
 def printData() :
-    print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], sep=" \t ")
+    print(db[0].date(), db[0].strftime("%H:%M:%S"), db[1], db[2], db[3], db[4], db[5], sep=" \t ")
 
 def parseArguments(args) :
     global _printData
@@ -64,24 +64,30 @@ def usage() :
     print("-t, --time NUM \t\t Set NUM seconds delay between each time data is fetched(Default is 30)")
     print("-h, --help \t\t Display this help and exit")
 
+def printInfo() :
+    print("Coinome Price Fetcher")
+    print("Store : %s | Refresh frequency : %d" % (_storeData, _sec))
+
 def openDatabase() :
-    _fileName = ("data/db_%s.db" % db[0].date())
+    _fileName = ("data/db_%s.db" % datetime.now().date().strftime("%b_%Y"))
     # Connect to the database
     conn = sqlite3.connect(_fileName)
     curr = conn.cursor()
-    # Create table
-    curr.execute('''CREATE TABLE IF NOT EXISTS RATES
-        (time text, BTCINR real, BCHINR real, LTCINR real, DASHINR real)''')
     # Return cursor
     return curr
 
 def storeData(curr) :
+    # Create table
+    curr.execute('''CREATE TABLE IF NOT EXISTS RATES_%d
+        (time text, BTCINR real, BCHINR real, LTCINR real, DASHINR real, DGBINR real)''' % datetime.now().day)
+    #Store data
     data = (db[0].strftime("%H:%M:%S"),
            float(db[1].replace(',','')),
            float(db[2].replace(',','')),
            float(db[3].replace(',','')),
-           float(db[4].replace(',','')))
-    curr.execute("INSERT INTO RATES VALUES(?, ?, ?, ?, ?)", data)
+           float(db[4].replace(',','')),
+           float(db[5].replace(',','')))
+    curr.execute("INSERT INTO RATES_%d VALUES(?, ?, ?, ?, ?, ?)" % db[0].day, data)
 
 
 # ::: MAIN from here :::
@@ -89,18 +95,27 @@ def storeData(curr) :
 #Parse Commandline Arguments
 parseArguments(sys.argv[1:])
 
-if(_printData) :
-    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH\INR", sep=" \t ")
 #Creates database folder in the first run
 if not os.path.exists("data") :
     os.makedirs("data")
+
+#Print Options
+printInfo()
+
+#Print table headers
+if(_printData) :
+    print("Date", "\t Time", "\t BTC/INR", "BCH/INR", "LTC/INR", "DASH/INR", "DGB/INR", sep=" \t ")
+#Open Database
+if(_storeData) :
+    curr = openDatabase()
+
+#The Scraping happens from here
 try :
     while(True) :
         db = fetchDataOnce()
         if(_printData) :
             printData()
         if(_storeData) :
-            curr = openDatabase()
             storeData(curr)
         if(_printOnce) :
             sys.exit(0)
