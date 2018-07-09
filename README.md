@@ -1,5 +1,8 @@
 # Coinome-Exchange-Rates
 ---
+
+> This project is **dead** due to heavy change in coinome's *exchange* interface.
+
 Web Scraper written in python 3 with BeautifulSoup4 library to catch live exchange rates from coinome.  
 Supports but displaying and storing the data in database (database backend is sqlite3).
 
